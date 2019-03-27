@@ -13,6 +13,7 @@ class Node {
 public:
 	int data;
 	Node* next;
+
 };
 
 class List{
@@ -20,10 +21,45 @@ class List{
 public:
 	Node* head;
 	Node* tail;
+	int length;
+
+	List();
+	void add_node(int value);
+	void remove_kth_last(int k);
 };
 
-Node::Node(int value, Node* nxt = nullptr){
-	data = value;
-	next = nxt; 
+
+List::List(){
+	head = nullptr;
+	tail = nullptr;
 }
 
+void List::add_node(int value){
+	Node* tmp =  new Node;
+	tmp->data = value;
+
+	tmp->next = nullptr;
+
+	if (head == nullptr){
+		head = tmp;
+		tail = tmp;
+	}
+	else{
+		tail->next = tmp;
+		tail = tmp;
+	}
+
+	length += 1;
+}
+
+void List::remove_kth_last(int k){
+	int counter = 1;
+	Node* tmp = head;
+	while(counter < length - k){
+		tmp = tmp->next;
+		counter += 1;
+	}
+	
+	delete tmp;
+
+}
