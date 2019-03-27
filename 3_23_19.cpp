@@ -3,7 +3,7 @@
 using namespace std;
 
 /*
-Implement locking in a binary tree. A binary tree node can be locked or unlocked only if all of its descendants or ancestors are not locked.
+Implement locking in a binary tree. A binary tree node can be locked or unlocked only if all of its descendants or ancestors are unlocked.
 
 Design a binary tree node class with the following methods:
 
@@ -28,7 +28,7 @@ public:
 
 	Node(int value, Node* prt, Node* lft, Node* rt);
 	bool check_ancestors();
-	void check_descendants();
+	void update_ancestors(bool L_or_UL);
 	bool is_locked();
 	bool lock();
 	bool unlock();
@@ -55,29 +55,149 @@ bool Node::check_ancestors(){
 		return false;
 	}
 
-	return parent->check_ancestors;
+	return parent->check_ancestors();
 }
 
-void Node::check_descendants(){
-
-	if (left == nullptr && right == nullptr){
-
+void Node::update_ancestors(bool L_or_UL){
+	if(parent != nullptr){
+		if(!L_or_UL){
+			parent->locked_descendants_count += 1;
+			parent->update_ancestors(L_or_UL);
+		}
+		else{
+			parent->locked_descendants_count -= 1;
+			parent->update_ancestors(L_or_UL);
+		}
 	}
-	else if(left->locked || right->locked){
-		locked_descendants_count += 1;
-
-	}
-	else{
-		left->check_descendants;
-		right->check_descendants;
-	}
-	
 }
-
 
 bool Node::lock(){
-	check_descendants;
 
-	while(current
+	if (left == nullptr && right == nullptr){
+		if (check_ancestors()){
+			locked = true;
+			cout << "Lock successful" << "\n";
+			update_ancestors(false);
+			return true;	
+		}
+		else{
+			cout << "Could not lock" << "\n";
+			return false;
+		}
+	}
+	else if (parent == nullptr){
+		if (locked_descendants_count == 0){
+			locked = true;
+			cout << "Lock successful" << "\n";
+			return true;
+		}
+		else{
+			cout << "Could not lock" << "\n";
+			return false;
+		}
+	}
+	else {
+		if (locked_descendants_count == 0 || check_ancestors()){
+			locked = true;
+			cout << "Lock successful" << "\n";
+			update_ancestors(false);
+			return true;
+		}
+		else{
+			cout << "Could not lock" << "\n";
+			return false;
+		}
+	}
 }
 
+bool Node::unlock(){
+
+	if (left == nullptr && right == nullptr){
+		if (check_ancestors()){
+			locked = false;
+			cout << "Unlock successful" << "\n";
+			update_ancestors(true);
+			return true;	
+		}
+		else{
+			cout << "Could not unlock" << "\n";
+			return false;
+		}
+	}
+	else if (parent == nullptr){
+		if (locked_descendants_count == 0){
+			locked = false;
+			cout << "Unlock successful" << "\n";
+			return true;
+		}
+		else{
+			cout << "Could not unlock" << "\n";
+			return false;
+		}
+	}
+	else {
+		if (locked_descendants_count == 0 || check_ancestors()){
+			locked = false;
+			cout << "Unlock successful" << "\n";
+			update_ancestors(true);
+			return true;
+		}
+		else{
+			cout << "Could not unlock" << "\n";
+			return false;
+		}
+	}
+}
+
+/*
+     2
+    / \
+   1   5 
+  /	\   \
+ 6   3   4
+	      \
+		   0
+
+*/
+
+
+int main() {
+
+	Node zero(0);
+	Node one(1);
+	Node two(2);
+	Node three(3);
+	Node four(4);
+	Node five(5);
+	Node six(6);
+
+	two.left = &one;
+	two.right = &five;
+
+	five.right = &four;
+	five.parent = &two;
+
+	one.parent = &two;
+
+
+	zero.parent = &four;
+	four.parent = &five;
+	four.right = &zero;
+
+	six.parent = &one;
+
+	three.parent = &one;
+
+    six.lock();
+	three.lock();
+	four.lock();
+
+	cout << four.locked << "\n";
+	//three.lock();
+	zero.lock();
+
+	//cout << two.locked_descendants_count << "\n";
+
+	system("pause");
+	return 0;
+}
