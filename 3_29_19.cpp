@@ -1,44 +1,67 @@
-#include <string>
 #include <iostream>
-#include <sstream>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
 /*
-Run-length encoding is a fast and simple method of encoding strings. The basic idea is to represent repeated successive characters as a single count and character.
-For example, the string "AAAABBBCCDAA" would be encoded as "4A3B2C1D2A".
+You are given an array of non-negative integers that represents a two-dimensional elevation map where each element 
+is unit-width wall and the integer is the height. Suppose it will rain and all spots between two walls get filled up.
 
-Implement run-length encoding and decoding. You can assume the string to be encoded have no digits and consists solely of alphabetic characters. You can assume the string to be decoded is valid.
+Compute how many units of water remain trapped on the map in O(N) time and O(1) space.
+
+For example, given the input [2, 1, 2], we can hold 1 unit of water in the middle.
+
+Given the input [3, 0, 1, 3, 0, 5], we can hold 3 units in the first index, 2 in the second, 
+and 3 in the fourth index (we cannot hold 5 since it would run off to the left), so we can trap 8 units of water.
 */
 
+int water_trap(vector<int> v) {
 
-string run_length_encoder(string s){
-	string output;
-	int letter_counter = 1;
-	for (int i = 0; i < s.size()-1; i++){
-		if (s[i] == s[i+1]){
-			letter_counter += 1;
-			if(i+1 == s.size()-1){
-				output.append(to_string(letter_counter));
-				output.push_back(s[i]);
+	int left_wall_height = v[0];
+	int left_wall_position = 1;
+	int right_wall_height;
+	int right_wall_position;
+	int water_units = 0;
+	int units_already_taken = 0;
+	for (int i = 1; i < v.size(); i++) {
+		if (v[i] != 0) {
+			right_wall_height = v[i];
+			right_wall_position = i+1;
+			if (right_wall_height < left_wall_height) {
+				water_units += (right_wall_position - left_wall_position - 1)*right_wall_height - units_already_taken;
+				units_already_taken += water_units + right_wall_height;
 			}
+			else {
+				water_units += (right_wall_position - left_wall_position - 1)*left_wall_height - units_already_taken;
+				left_wall_position = right_wall_position;
+				units_already_taken = 0;
+			}
+			
 		}
-		else{
-			output.append(to_string(letter_counter));
-		    output.push_back(s[i]);
-			letter_counter = 1;
-		}
-		
 	}
-	return output;
+	return water_units;
 }
 
 int main() {
 
-	string s1("AAAABBBCCDAA");
+	vector<int> v;
+	
+	v.push_back(3);
+	v.push_back(0);
+	v.push_back(1);
+	v.push_back(3);
+	v.push_back(0);
+	v.push_back(5);
+	
 
-	string s2 = run_length_encoder(s1);
+	/*
+	v.push_back(3);
+	v.push_back(1);
+	v.push_back(3);
+	v.push_back(0);
+	*/
 
-	cout << s2 << "\n";
+	cout << water_trap(v) << "\n";
 
 	system("Pause");
 	return 0;
