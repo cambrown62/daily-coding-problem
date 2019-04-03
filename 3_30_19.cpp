@@ -11,13 +11,16 @@ Given two strings, compute the edit distance between them.
 */
 
 int edit_distance(string s1, string s2){
-	int output = 0; //abs((int)(s1.size() - s2.size()));
-	for (int i = 0; i < (s1.size() > s2.size() ? s2.size() : s1.size()); i++){
-		if (s2.find(s1[i]) == string::npos){
+	int output = 0;
+	string tmp1 = s1.size() >= s2.size() ? s1 : s2;
+	string tmp2 = s1.size() >= s2.size() ? s2 : s1;
+
+	for (int i = 0; i < tmp1.size(); i++){
+		if (tmp2.find(tmp1[i]) == string::npos){
 			output += 1;
 		}
-		else if (s2.find(s1[i]) != string::npos){
-			s2.erase(s2.find(s1[i]));
+		else{
+			tmp2.erase(tmp2.begin() + tmp2.find(tmp1[i]));
 		}
 	}
 	return output;
@@ -25,10 +28,10 @@ int edit_distance(string s1, string s2){
 
 int main() {
 
-	string s1("kittan");
+	string s1("kitt");
 	string s2("ball");
 
-	cout << edit_distance(s1, s2) << "\n";
+	cout << edit_distance(s2, s1) << "\n";
 
 	system("Pause");
 	return 0;
