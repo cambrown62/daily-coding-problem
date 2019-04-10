@@ -36,6 +36,7 @@ public:
 	Game_of_Life(std::vector<std::vector<int>> init_coords);
 
 	void play(int time_steps);
+	void print_board();
 
 };
 
@@ -49,7 +50,7 @@ Game_of_Life::Game_of_Life(std::vector<std::vector<int>> init_coords){
 	int btm_rgt_row = std::max_element(begin(init_coords), end(init_coords));
 	int btm_rgt_col = std::max_element(begin(init_coords), end(init_coords), comp);
 	
-	board.resize(btm_rgt_row, btm_rgt_col);
+	board.resize(btm_rgt_row+2, btm_rgt_col+2);
 
 	/*
 	for (int i = 0; i < init_coords.size(); i++){
@@ -75,15 +76,36 @@ Game_of_Life::Game_of_Life(std::vector<std::vector<int>> init_coords){
 
 	for (int i = 0; i < board.size1(); i++){
 		for (int j = 0; j < board.size2(); j++){
-			if (board(i,j) != '*'){
+			if (i == 0 || i == board.size1()-1){
+				board(i,j) == 'e';
+			}
+			else if (j == 0 || j == board.size2()-1){
+				board(i,j) == 'e';
+			}
+			else if (board(i,j) != '*'){
 				board(i,j) = '.';
 			}
 		}
 	}
 	
+
 	
 }
 
+void Game_of_Life::print_board(){
+	for (int i = 0; i < board.size1(); i++){
+		for (int j = 0; j < board.size2(); j++){
+			if (j == board.size2()-1){
+				std::cout << board(i,j) << "\n";
+			}
+			else{
+				std::cout << board(i,j);
+			}
+		}
+	}
+}
+
+/*
 void Game_of_Life::play(int time_steps){
 	for (int t = 0; t < time_steps; t++){
 		for (int i = 0; i < board.size1(); i++){
@@ -92,4 +114,13 @@ void Game_of_Life::play(int time_steps){
 			}
 		}
 	}
+}
+*/
+
+int main() {
+
+	 
+
+	system("Pause");
+	return 0;
 }
