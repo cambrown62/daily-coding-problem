@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 using namespace boost::numeric::ublas;
 
 /*
@@ -48,13 +49,19 @@ bool comp(std::vector<int> a, std::vector<int> b) {
 
 Game_of_Life::Game_of_Life(std::vector<std::vector<int>> init_coords) {
 
-	int btm_rgt_row = std::max_element(begin(init_coords), end(init_coords));
-	int btm_rgt_col = std::max_element(begin(init_coords), end(init_coords), comp);
+	//auto btm_rgt_row = *std::max_element(begin(init_coords), end(init_coords));
+	//auto btm_rgt_col = *std::max_element(begin(init_coords), end(init_coords), comp);
 
-	int btm_rgt_row = std::max_element(init_coords.begin(), init_coords.end() );
-	int btm_rgt_col = std::max_element(begin(init_coords), end(init_coords), comp);
+	auto btm_rgt_row_it = std::max_element(init_coords.begin(), init_coords.end() );
+	auto btm_rgt_col_it = std::max_element(init_coords.begin(), init_coords.end(), comp);
+
+	int btm_rgt_row = (*btm_rgt_row_it)[0];
+	int btm_rgt_col = (*btm_rgt_col_it)[1];
 
 	board.resize(btm_rgt_row + 2, btm_rgt_col + 2);
+
+	//std::cout << btm_rgt_row << "\n";
+	//std::cout << btm_rgt_col << "\n";
 
 	/*
 	for (int i = 0; i < init_coords.size(); i++){
@@ -74,16 +81,16 @@ Game_of_Life::Game_of_Life(std::vector<std::vector<int>> init_coords) {
 	*/
 
 	for (int i = 0; i < init_coords.size(); i++) {
-		board(init_coords[i][0]+1, init_coords[i][1]+1) = '*';
+		board(init_coords[i][0], init_coords[i][1]) = '*';
 	}
 
 	for (int i = 0; i < board.size1(); i++) {
 		for (int j = 0; j < board.size2(); j++) {
 			if (i == 0 || i == board.size1() - 1) {
-				board(i, j) == 'e';
+				board(i, j) = 'e';
 			}
 			else if (j == 0 || j == board.size2() - 1) {
-				board(i, j) == 'e';
+				board(i, j) = 'e';
 			}
 			else if (board(i, j) != '*') {
 				board(i, j) = '.';
@@ -118,6 +125,9 @@ void Game_of_Life::print_board() {
 			if (j == board.size2() - 1) {
 				std::cout << board(i, j) << "\n";
 			}
+			else if (i == board.size1() - 1 && j == board.size2() - 1 ) {
+				std::cout << board(i, j) << "\n\n\n\n";
+			}
 			else {
 				std::cout << board(i, j);
 			}
@@ -133,28 +143,46 @@ void Game_of_Life::play(int time_steps){
 			for (int j = 0; j < board.size2(); j++){
 				if (board(i, j) != 'e') {
 					living_neighbors = check_neighbors(i, j);
-				}
-				if (board(i,j) == '*')  {
-					if (living_neighbors >= 3 || living_neighbors < 2) {
-						next_board(i, j) = '.';
+					if (board(i, j) == '*') {
+						if (living_neighbors >= 3 || living_neighbors < 2) {
+							next_board(i, j) = '.';
+						}
 					}
-				}
-				else if (board(i,j) = '.') {
-					if (living_neighbors == 3) {
-						next_board(i, j) = '*';
+					else if (board(i, j) = '.') {
+						if (living_neighbors == 3) {
+							next_board(i, j) = '*';
+						}
 					}
 				}
 			}
 		}
+		board = next_board;
+		print_board();
 	}
 
-	board = next_board;
+	
+	
 }
 
 
 int main() {
 
+	std::vector<std::vector<int>> init_coords;
+	std::vector<int> coords1(2, 1);
+	std::vector<int> coords2(2, 2);
+	std::vector<int> coords3(2, 3);
+	std::vector<int> coords4(2, 4);
 
+	init_coords.push_back(coords1);
+	init_coords.push_back(coords2);
+	init_coords.push_back(coords3);
+	init_coords.push_back(coords4);
+
+	Game_of_Life myGame(init_coords);
+
+	myGame.play(5);
+
+	//myGame.print_board();
 
 	system("Pause");
 	return 0;
