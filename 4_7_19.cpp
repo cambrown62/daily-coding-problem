@@ -20,18 +20,9 @@ Once initialized, it should print out the board state at each step. Since it's a
 You can represent a live cell with an asterisk (*) and a dead cell with a dot (.).
 */
 
-/*
-struct Cell{
-int row;
-int col;
-bool alive;
-};
-*/
-
 class Game_of_Life {
 
 public:
-	//matrix<Cell> board;
 	matrix<char> board;
 	matrix<char> next_board;
 
@@ -49,9 +40,6 @@ bool comp(std::vector<int> a, std::vector<int> b) {
 
 Game_of_Life::Game_of_Life(std::vector<std::vector<int>> init_coords) {
 
-	//auto btm_rgt_row = *std::max_element(begin(init_coords), end(init_coords));
-	//auto btm_rgt_col = *std::max_element(begin(init_coords), end(init_coords), comp);
-
 	auto btm_rgt_row_it = std::max_element(init_coords.begin(), init_coords.end() );
 	auto btm_rgt_col_it = std::max_element(init_coords.begin(), init_coords.end(), comp);
 
@@ -59,26 +47,6 @@ Game_of_Life::Game_of_Life(std::vector<std::vector<int>> init_coords) {
 	int btm_rgt_col = (*btm_rgt_col_it)[1];
 
 	board.resize(btm_rgt_row + 2, btm_rgt_col + 2);
-
-	//std::cout << btm_rgt_row << "\n";
-	//std::cout << btm_rgt_col << "\n";
-
-	/*
-	for (int i = 0; i < init_coords.size(); i++){
-	board(init_coords[i][0], init_coords[i][1]).row = init_coords[i][0];
-	board(init_coords[i][0], init_coords[i][1]).col = init_coords[i][1];
-	board(init_coords[i][0], init_coords[i][1]).alive = true;
-	}
-
-	for (int i = 0; i < board.size1(); i++){
-	for (int j = 0; j < board.size2(); j++){
-	if (board(i,j).alive != true){
-	board(i,j).row = i;
-	board(i,j).col = j;
-	}
-	}
-	}
-	*/
 
 	for (int i = 0; i < init_coords.size(); i++) {
 		board(init_coords[i][0], init_coords[i][1]) = '*';
@@ -106,13 +74,17 @@ int Game_of_Life::check_neighbors(int i, int j) {
 	int living_neighbors = 0;
 	for (int dx = -1; dx <= 1; dx++) {
 		for (int dy = -1; dy <= 1; dy++) {
-			if (board(i + dy, j + dx) == '*') {
+			if (i + dy < 0 || i + dy > board.size1()-1 || j + dx < 0 || j + dx > board.size2()-1){
+				continue;
+			}
+			else if (board(i + dy, j + dx) == '*') {
 				living_neighbors += 1;
 			}
+
 		}
 	}
 	if (board(i, j) == '*') {
-		return living_neighbors--;
+		return living_neighbors-1;
 	}
 	else {
 		return living_neighbors;
@@ -126,7 +98,7 @@ void Game_of_Life::print_board() {
 				std::cout << board(i, j) << "\n";
 			}
 			else if (i == board.size1() - 1 && j == board.size2() - 1 ) {
-				std::cout << board(i, j) << "\n\n\n\n";
+				std::cout << board(i, j) << "\n" << "\n";
 			}
 			else {
 				std::cout << board(i, j);
@@ -138,20 +110,19 @@ void Game_of_Life::print_board() {
 
 void Game_of_Life::play(int time_steps){
 	int living_neighbors;
+	print_board();
 	for (int t = 0; t < time_steps; t++){
 		for (int i = 0; i < board.size1(); i++){
 			for (int j = 0; j < board.size2(); j++){
-				if (board(i, j) != 'e') {
-					living_neighbors = check_neighbors(i, j);
-					if (board(i, j) == '*') {
-						if (living_neighbors >= 3 || living_neighbors < 2) {
-							next_board(i, j) = '.';
-						}
+				living_neighbors = check_neighbors(i, j);
+				if (board(i, j) == '*') {
+					if (living_neighbors > 3 || living_neighbors < 2) {
+						next_board(i, j) = '.';
 					}
-					else if (board(i, j) = '.') {
-						if (living_neighbors == 3) {
-							next_board(i, j) = '*';
-						}
+				}
+				else if (board(i, j) = '.') {
+					if (living_neighbors == 3) {
+						next_board(i, j) = '*';
 					}
 				}
 			}
@@ -172,15 +143,26 @@ int main() {
 	std::vector<int> coords2(2, 2);
 	std::vector<int> coords3(2, 3);
 	std::vector<int> coords4(2, 4);
+	//std::vector<int> coords5;
+	//coords5.push_back(2);
+	//coords5.push_back(1);
+	/*
+	std::vector<int> coords6;
+	coords6.push_back(3);
+	coords6.push_back(1);
+	*/
 
 	init_coords.push_back(coords1);
 	init_coords.push_back(coords2);
 	init_coords.push_back(coords3);
 	init_coords.push_back(coords4);
+	//init_coords.push_back(coords5);
+	//init_coords.push_back(coords6);
+	
 
 	Game_of_Life myGame(init_coords);
 
-	myGame.play(5);
+	myGame.play(3);
 
 	//myGame.print_board();
 
